@@ -7,25 +7,27 @@ export class Search {
             const { q, maxResults = 5, topic = "general" } = req.query;
 
             if (!q) return res.status(400).json({ error: "Missing query" });
-            if (!req.user) return res.status(401).json({ error: "Unauthorized" });
+            if (!req.user || !req.apiKey) return res.status(401).json({ error: "Unauthorized" });
 
-            const results = await getSearchResults(q, maxResults);
+            // Atomic increment to avoid race conditions
+            const updated = await req.user.updateOne(
+                { "apiKeys.key": req.apiKey.key, "apiKeys.used": { $lt: req.apiKey.limit } },
+                { $inc: { "apiKeys.$.used": 1 } }
+            );
 
-            // Get the first API key (or find the correct one)
-            const apiKey = req.user.apiKeys[0];
-            if (!apiKey) return res.status(400).json({ error: "No API key found" });
+            if (updated.modifiedCount === 0) {
+                return res.status(429).json({ error: "API limit exceeded" });
+            }
 
-            // Increment usage
-            apiKey.used += 1;
-            await req.user.save();
+            const results = await getSearchResults(q as string, Number(maxResults));
 
             return res.status(200).json({
                 query: q,
                 results,
                 usage: {
-                    limit: apiKey.limit,
-                    used: apiKey.used,
-                    remaining: apiKey.limit - apiKey.used,
+                    limit: req.apiKey.limit,
+                    used: req.apiKey.used + 1, // reflect increment
+                    remaining: req.apiKey.limit - (req.apiKey.used + 1),
                 },
             });
         } catch (error: any) {
