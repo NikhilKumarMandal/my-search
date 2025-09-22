@@ -10,7 +10,7 @@ const auth = new Auth();
 
 router.post("/register", asyncWrapper(auth.register));
 router.post("/login", asyncWrapper(auth.login));
-router.post("/logout", asyncWrapper(auth.logout));
+router.post("/logout", authenticate, asyncWrapper(auth.logout));
 router.post("/refresh", asyncWrapper(auth.register));
 router.get("/self",authenticate ,asyncWrapper(auth.self));
 

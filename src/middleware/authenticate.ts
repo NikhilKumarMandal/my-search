@@ -1,5 +1,7 @@
 import { expressjwt } from "express-jwt";
 import type { Request as ExpressRequest } from "express";
+import dotenv from "dotenv";
+dotenv.config();
 
 export default expressjwt({
     secret: process.env.ACCESS_TOKEN_SECRET!,

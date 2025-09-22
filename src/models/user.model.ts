@@ -1,10 +1,9 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import jwt from "jsonwebtoken";
 
-
-// Subdocument interface
+// Subdocument interface for API keys
 export interface IApiKey {
-    name: string
+    name: string;
     key: string;
     limit: number;
     used: number;
@@ -17,39 +16,46 @@ export interface IUser extends Document {
     avatar?: string;
     apiKeys: IApiKey[];
     refreshToken?: string;
-    generateAccessToken: () => string;
-    generateRefreshToken: () => string;
+
+    // Methods
+    generateAccessToken(): string;
+    generateRefreshToken(): string;
 }
 
-// ApiKey Schema
-const apiKeySchema = new Schema<IApiKey>({
-    name: { type: String, required: true, },
-    key: { type: String, required: true, unique: true },
-    limit: { type: Number, default: 1200 },
-    used: { type: Number, default: 0 }
-}, { _id: false });
+// Optional: export a convenient type alias
+export type UserDocument = IUser;
 
-// User Schema
-const userSchema = new Schema<IUser>({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    avatar: { type: String },
-    apiKeys: [apiKeySchema],
-    refreshToken: { type: String }
-}, { timestamps: true });
-
-// Methods
-userSchema.methods.generateAccessToken = function () {
-    return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: '1d' });
-};
-userSchema.methods.generateRefreshToken = function () {
-    return jwt.sign({
-        _id: this._id
-    },
-    process.env.REFRESH_TOKEN_SECRET!,
+// API key schema (subdocument)
+const apiKeySchema = new Schema<IApiKey>(
     {
-        expiresIn: '10d'
-    });
+        name: { type: String, required: true },
+        key: { type: String, required: true, unique: true },
+        limit: { type: Number, default: 1200 },
+        used: { type: Number, default: 0 },
+    },
+    { _id: false }
+);
+
+// User schema
+const userSchema = new Schema<IUser>(
+    {
+        name: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        avatar: { type: String },
+        apiKeys: { type: [apiKeySchema], default: [] },
+        refreshToken: { type: String },
+    },
+    { timestamps: true }
+);
+
+// Add methods to the schema
+userSchema.methods.generateAccessToken = function (): string {
+    return jwt.sign({ _id: this._id }, process.env.ACCESS_TOKEN_SECRET!, { expiresIn: "1d" });
 };
 
+userSchema.methods.generateRefreshToken = function (): string {
+    return jwt.sign({ _id: this._id }, process.env.REFRESH_TOKEN_SECRET!, { expiresIn: "10d" });
+};
+
+// Export the model
 export const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);

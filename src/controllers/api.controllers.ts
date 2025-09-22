@@ -1,5 +1,5 @@
 import { User } from "../models/user.model";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 import crypto from "crypto";
 import type { AuthRequest } from "../types/types";
 import { ApiError } from "express-strategy";

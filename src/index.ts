@@ -1,11 +1,13 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import searchRouter from "./src/routes/search.routes";
-import apiRouter from "./src/routes/api.routes";
-import authRouter from "./src/routes/auth.routes";
-import { globalErrorHandler } from "./src/middleware/globalErrorHandler";
+import searchRouter from "./routes/search.routes";
+import apiRouter from "./routes/api.routes";
+import authRouter from "./routes/auth.routes";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import cors from "cors";
-import { db } from "./src/db/db";
+import { db } from "./db/db";
+import dotenv from "dotenv";
+dotenv.config();
 
 const PORT = process.env.PORT ?? 8000;
 
@@ -37,8 +39,8 @@ db()
             throw error
         })
         
-        app.listen(process.env.PORT || 8000, () => {
-            console.log(`⚙️  Server is running at port : ${process.env.PORT}`);
+        app.listen(PORT, () => {
+            console.log(`⚙️  Server is running at port : ${PORT}`);
         })
     })
     .catch((err) => {

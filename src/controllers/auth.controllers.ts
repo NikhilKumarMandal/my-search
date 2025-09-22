@@ -1,10 +1,10 @@
+import { AuthRequest } from './../types/types';
 import axios from "axios";
 import type { CookieOptions, Request, Response } from "express";
 import { ApiError, ApiResponse } from "express-strategy";
 import { User } from "../models/user.model";
 import logger from "../utils/logger";
 import jwt, { type JwtPayload } from "jsonwebtoken";
-import type { AuthRequest } from "../types/types";
 
 const generateAccessAndRefreshTokens = async (userId: string) => {
     const user = await User.findById(userId);
@@ -160,10 +160,10 @@ export class Auth {
         }
      }
     
-    logout = async (req: Request, res: Response) => {
+    logout = async (req: AuthRequest, res: Response) => {
         try {
             await User.findByIdAndUpdate(
-                req.user._id,
+                req.auth?._id,
                 {
                     $unset: {
                         refreshToken: 1
