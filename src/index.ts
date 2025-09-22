@@ -18,6 +18,7 @@ app.use(
     cors({
         origin: [
             "http://localhost:5173",
+            "https://mysearch.pixxelai.live"
         ],
         methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         credentials: true,
