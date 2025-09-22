@@ -25,9 +25,6 @@ app.use(
 );
 
 
-
-
-
 app.use("/api/v1/search", searchRouter);
 app.use("/api/v1/api", apiRouter);
 app.use("/api/v1/auth", authRouter);

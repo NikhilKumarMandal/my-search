@@ -27,7 +27,7 @@ export class Api{
             user.apiKeys.push({
                 name,
                 key: newKey,
-                limit: 1000,   
+                limit: 1200,   
                 used: 0
             });
 
@@ -36,7 +36,7 @@ export class Api{
             res.status(201).json({
                 message: "API key created",
                 apiKey: newKey,
-                limit: 1000,
+                limit: 1200,
                 used: 0
             });
         } catch (error) {
@@ -92,6 +92,7 @@ export class Api{
                     key: key.key,
                     limit: key.limit,
                     used: key.used,
+                    name: key.name
                 }))
             });
         } catch (error) {

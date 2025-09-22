@@ -29,7 +29,7 @@ export type UserDocument = IUser;
 const apiKeySchema = new Schema<IApiKey>(
     {
         name: { type: String, required: true },
-        key: { type: String, required: true, unique: true },
+        key: { type: String, required: true}, 
         limit: { type: Number, default: 1200 },
         used: { type: Number, default: 0 },
     },
