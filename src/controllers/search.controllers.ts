@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { getSearchResults } from "../utils/getSearchResult";
+import { User } from "../models/user.model";
 
 export class Search {
     search = async (req: Request, res: Response) => {
@@ -9,9 +10,9 @@ export class Search {
             if (!q) return res.status(400).json({ error: "Missing query" });
             if (!req.user || !req.apiKey) return res.status(401).json({ error: "Unauthorized" });
 
-            // Atomic increment to avoid race conditions
-            const updated = await req.user.updateOne(
-                { "apiKeys.key": req.apiKey.key, "apiKeys.used": { $lt: req.apiKey.limit } },
+            // ✅ Use Model.updateOne instead of req.user.updateOne
+            const updated = await User.updateOne(
+                { _id: req.user._id, "apiKeys.key": req.apiKey.key, "apiKeys.used": { $lt: req.apiKey.limit } },
                 { $inc: { "apiKeys.$.used": 1 } }
             );
 
@@ -26,11 +27,12 @@ export class Search {
                 results,
                 usage: {
                     limit: req.apiKey.limit,
-                    used: req.apiKey.used + 1, // reflect increment
+                    used: req.apiKey.used + 1, 
                     remaining: req.apiKey.limit - (req.apiKey.used + 1),
                 },
             });
         } catch (error: any) {
+            console.error("Search error:", error);
             res.status(500).json({ error: "Server error", details: error.message });
         }
     };
