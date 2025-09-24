@@ -22,12 +22,15 @@ export class Search {
 
             const results = await getSearchResults(q as string, Number(maxResults));
 
+            const bestAnswer = results.length > 0 ? results[0].snippet : "No data found.";
+
             return res.status(200).json({
                 query: q,
-                results,
+                answer: bestAnswer, 
+                results,           
                 usage: {
                     limit: req.apiKey.limit,
-                    used: req.apiKey.used + 1, 
+                    used: req.apiKey.used + 1,
                     remaining: req.apiKey.limit - (req.apiKey.used + 1),
                 },
             });
